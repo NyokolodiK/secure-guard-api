@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const core_1 = require("@nestjs/core");
 const throttler_1 = require("@nestjs/throttler");
+const nestjs_pino_1 = require("nestjs-pino");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const prisma_module_1 = require("./prisma/prisma.module");
@@ -27,6 +28,14 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            nestjs_pino_1.LoggerModule.forRoot({
+                pinoHttp: {
+                    transport: process.env.NODE_ENV !== 'production'
+                        ? { target: 'pino-pretty' }
+                        : undefined,
+                    level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+                },
+            }),
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 validationSchema: environment_schema_1.validationSchema,

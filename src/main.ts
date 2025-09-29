@@ -1,13 +1,14 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
-import compression from 'compression';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   // Get ConfigService to access environment variables reliably
   const configService = app.get(ConfigService);
@@ -17,7 +18,7 @@ async function bootstrap() {
 
   // Apply essential security middleware
   app.use(helmet());
-  app.use(compression());
+  app.useLogger(app.get(Logger));
 
   // Enable CORS
   app.enableCors({
@@ -36,6 +37,10 @@ async function bootstrap() {
 
   // Set global prefix
   app.setGlobalPrefix('api');
+
+  // Apply global exception filter
+  const httpAdapterHost = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
 
   // Enable graceful shutdown
   // This ensures that the application listens for shutdown signals (e.g., SIGTERM)
@@ -64,14 +69,15 @@ async function bootstrap() {
 
   app.enableShutdownHooks();
 
-  await app.listen(port);
-
-  console.log(`🚀 SecureGuard API is running on: http://localhost:${port}/api`);
-  console.log(`🔒 CORS enabled for origin: ${frontendUrl}`);
+  const logger = app.get(Logger);
+  await app.listen(port, () => {
+    logger.log(`🚀 SecureGuard API is running on: http://localhost:${port}/api`);
+    logger.log(`🔒 CORS enabled for origin: ${frontendUrl}`);
+    if (nodeEnv === 'development') {
+      logger.log(`📚 Swagger Docs available at: http://localhost:${port}/api-docs`);
+    }
+  });
 }
 
-bootstrap().catch((err) => {
-  console.error('Error starting server:', err);
-  process.exit(1);
-});
+bootstrap();
 
