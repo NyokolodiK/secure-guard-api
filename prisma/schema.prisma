@@ -1,0 +1,286 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User authentication and profiles
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  password          String
+  firstName         String?  @map("first_name")
+  lastName          String?  @map("last_name")
+  phone             String?
+  profileImageUrl   String?  @map("profile_image_url")
+  userType          UserType @default(CLIENT) @map("user_type")
+  companyId         String?  @map("company_id")
+  rating            Float    @default(0)
+  isEmailVerified   Boolean  @default(false) @map("is_email_verified")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  company           Company?           @relation(fields: [companyId], references: [id])
+  clientBookings    Booking[]          @relation("ClientBookings")
+  notifications     Notification[]
+  companyReviews    CompanyReview[]
+  guardReviews      GuardReview[]
+  userSessions      UserSession[]
+  userPreferences   UserPreference[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  token        String   @unique
+  refreshToken String?  @map("refresh_token")
+  expiresAt    DateTime @map("expires_at")
+  isActive     Boolean  @default(true) @map("is_active")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model UserPreference {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  key       String
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@map("user_preferences")
+}
+
+// Companies
+model Company {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  email       String  @unique
+  phone       String?
+  address     String?
+  logoUrl     String? @map("logo_url")
+  rating      Float   @default(0)
+  reviewCount Int     @default(0) @map("review_count")
+  verified    Boolean @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  users         User[]
+  guards        Guard[]
+  bookings      Booking[]
+  reviews       CompanyReview[]
+
+  @@map("companies")
+}
+
+// Guards
+model Guard {
+  id              String      @id @default(uuid())
+  companyId       String      @map("company_id")
+  userId          String?     @map("user_id")
+  firstName       String      @map("first_name")
+  lastName        String      @map("last_name")
+  email           String      @unique
+  phone           String?
+  profileImageUrl String?     @map("profile_image_url")
+  bio             String?
+  rating          Float       @default(0)
+  reviewCount     Int         @default(0) @map("review_count")
+  status          GuardStatus @default(AVAILABLE)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  company         Company         @relation(fields: [companyId], references: [id])
+  bookingGuards   BookingGuard[]
+  guardLocations  GuardLocation[]
+  reviews         GuardReview[]
+
+  @@map("guards")
+}
+
+// Bookings
+model Booking {
+  id               String        @id @default(uuid())
+  clientId         String        @map("client_id")
+  companyId        String        @map("company_id")
+  status           BookingStatus @default(PENDING)
+  date             String
+  time             String
+  duration         Int
+  numGuards        Int           @default(1) @map("num_guards")
+  attire           Attire        @default(SUIT)
+  vehicleType      String        @map("vehicle_type")
+  pickupLocation   String        @map("pickup_location")
+  pickupLat        Float?        @map("pickup_lat")
+  pickupLng        Float?        @map("pickup_lng")
+  dropoffLocation  String        @map("dropoff_location")
+  dropoffLat       Float?        @map("dropoff_lat")
+  dropoffLng       Float?        @map("dropoff_lng")
+  specialRequests  String?       @map("special_requests")
+  totalPrice       Float?        @map("total_price")
+  startTime        DateTime?     @map("start_time")
+  endTime          DateTime?     @map("end_time")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  client           User            @relation("ClientBookings", fields: [clientId], references: [id])
+  company          Company         @relation(fields: [companyId], references: [id])
+  bookingGuards    BookingGuard[]
+  guardLocations   GuardLocation[]
+  companyReviews   CompanyReview[]
+  guardReviews     GuardReview[]
+
+  @@map("bookings")
+}
+
+model BookingGuard {
+  id        String            @id @default(uuid())
+  bookingId String            @map("booking_id")
+  guardId   String            @map("guard_id")
+  status    BookingGuardStatus @default(ASSIGNED)
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  guard     Guard   @relation(fields: [guardId], references: [id])
+
+  @@map("booking_guards")
+}
+
+// Guard locations for real-time tracking
+model GuardLocation {
+  id         String   @id @default(uuid())
+  guardId    String   @map("guard_id")
+  bookingId  String   @map("booking_id")
+  latitude   Float
+  longitude  Float
+  recordedAt DateTime @default(now()) @map("recorded_at")
+
+  // Relations
+  guard      Guard   @relation(fields: [guardId], references: [id])
+  booking    Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("guard_locations")
+}
+
+// Reviews
+model CompanyReview {
+  id        String   @id @default(uuid())
+  bookingId String   @map("booking_id")
+  companyId String   @map("company_id")
+  clientId  String   @map("client_id")
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
+  client    User    @relation(fields: [clientId], references: [id])
+
+  @@map("company_reviews")
+}
+
+model GuardReview {
+  id        String   @id @default(uuid())
+  bookingId String   @map("booking_id")
+  guardId   String   @map("guard_id")
+  clientId  String   @map("client_id")
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  guard     Guard   @relation(fields: [guardId], references: [id])
+  client    User    @relation(fields: [clientId], references: [id])
+
+  @@map("guard_reviews")
+}
+
+// Notifications
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  relatedId String?  @map("related_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user      User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+// Enums
+enum UserType {
+  CLIENT
+  GUARD
+  COMPANY_ADMIN
+  SYSTEM_ADMIN
+
+  @@map("user_type")
+}
+
+enum GuardStatus {
+  AVAILABLE
+  ASSIGNED
+  ON_DUTY
+  OFF_DUTY
+
+  @@map("guard_status")
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+
+  @@map("booking_status")
+}
+
+enum BookingGuardStatus {
+  ASSIGNED
+  ARRIVED
+  COMPLETED
+
+  @@map("booking_guard_status")
+}
+
+enum Attire {
+  SUIT
+  CASUAL
+  TACTICAL
+
+  @@map("attire")
+}
