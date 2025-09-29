@@ -1,3 +1,4 @@
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   Controller,
   Post,
@@ -16,6 +17,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { User } from '@prisma/client';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -37,6 +39,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
   async logout(
     @CurrentUser() user: User,
@@ -54,6 +57,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   getProfile(@CurrentUser() user: User) {
     return { user };
   }

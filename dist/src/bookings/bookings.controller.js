@@ -13,6 +13,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingsController = void 0;
+const swagger_1 = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const bookings_service_1 = require("./bookings.service");
 const create_booking_dto_1 = require("./dto/create-booking.dto");
@@ -112,6 +113,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], BookingsController.prototype, "assignGuards", null);
 exports.BookingsController = BookingsController = __decorate([
+    (0, swagger_1.ApiTags)('Bookings'),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.Controller)('bookings'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [bookings_service_1.BookingsService])

@@ -1,3 +1,4 @@
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   Controller,
   Get,
@@ -18,6 +19,8 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserType } from '@prisma/client';
 import type { User, BookingStatus } from '@prisma/client';
 
+@ApiTags('Bookings')
+@ApiBearerAuth('JWT-auth')
 @Controller('bookings')
 @UseGuards(JwtAuthGuard)
 export class BookingsController {
