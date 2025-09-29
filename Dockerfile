@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 # ---- Dependencies ----
 FROM base AS dependencies
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --include=dev
 
 # ---- Build ----
 FROM dependencies AS build
