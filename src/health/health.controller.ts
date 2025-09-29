@@ -18,7 +18,7 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.prisma.pingCheck('prisma', this.prismaService),
+      () => this.prisma.pingCheck('prisma', this.prismaService as any),
     ]);
   }
 }
