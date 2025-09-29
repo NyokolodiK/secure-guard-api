@@ -14,6 +14,9 @@ COPY . .
 # Generate Prisma Client for the container's platform
 RUN npx prisma generate
 
+# Increase memory limit for the build process
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
 # Build the application
 RUN npm run build
 
