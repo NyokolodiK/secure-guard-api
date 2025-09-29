@@ -29,6 +29,10 @@ async function bootstrap() {
         transform: true,
     }));
     app.setGlobalPrefix('api');
+    app.enableVersioning({
+        type: common_1.VersioningType.URI,
+        defaultVersion: '1',
+    });
     const httpAdapterHost = app.get(core_1.HttpAdapterHost);
     app.useGlobalFilters(new all_exceptions_filter_1.AllExceptionsFilter(httpAdapterHost));
     if (nodeEnv === 'development') {
