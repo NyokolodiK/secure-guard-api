@@ -51,27 +51,25 @@ async function bootstrap() {
   // Enable graceful shutdown
   // This ensures that the application listens for shutdown signals (e.g., SIGTERM)
   // and correctly triggers the OnModuleDestroy lifecycle hook in services like PrismaService.
-  // Swagger API Documentation
-  if (nodeEnv === 'development') {
-    const config = new DocumentBuilder()
-      .setTitle('SecureGuard API')
-      .setDescription('The official API for the SecureGuard platform.')
-      .setVersion('1.0')
-      .addBearerAuth(
-        {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          name: 'JWT',
-          description: 'Enter JWT token',
-          in: 'header',
-        },
-        'JWT-auth', // This name here is important for matching up with @ApiBearerAuth()
-      )
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api-docs', app, document);
-  }
+  // Swagger API Documentation (enabled in development and production)
+  const config = new DocumentBuilder()
+    .setTitle('SecureGuard API')
+    .setDescription('The official API for the SecureGuard platform.')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth', // This name here is important for matching up with @ApiBearerAuth()
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
 
   app.enableShutdownHooks();
 
@@ -79,9 +77,7 @@ async function bootstrap() {
   await app.listen(port, () => {
     logger.log(`🚀 SecureGuard API is running on: http://localhost:${port}/api`);
     logger.log(`🔒 CORS enabled for origin: ${frontendUrl}`);
-    if (nodeEnv === 'development') {
-      logger.log(`📚 Swagger Docs available at: http://localhost:${port}/api-docs`);
-    }
+    logger.log(`📚 Swagger Docs available at: http://localhost:${port}/api-docs`);
   });
 }
 
