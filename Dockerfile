@@ -20,6 +20,9 @@ ENV NODE_OPTIONS=--max-old-space-size=4096
 # Build the application
 RUN npm run build
 
+# Hard fail if the main file was not created
+RUN test -f dist/src/main.js || (echo "Build failed: 'dist/src/main.js' was not created." && exit 1)
+
 # Remove devDependencies to create a lean production image
 RUN npm prune --production
 
@@ -30,4 +33,4 @@ ENV NODE_ENV=production
 EXPOSE 3001
 
 # Start the app
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]
