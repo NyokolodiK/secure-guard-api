@@ -35,8 +35,10 @@ async function bootstrap() {
     }),
   );
 
-  // Set global prefix
-  app.setGlobalPrefix('api');
+  // Set global prefix (exclude root routes and api-docs)
+  app.setGlobalPrefix('api', {
+    exclude: ['/'],
+  });
 
   // Enable API versioning
   app.enableVersioning({
