@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompaniesController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const companies_service_1 = require("./companies.service");
 const create_company_dto_1 = require("./dto/create-company.dto");
 const update_company_dto_1 = require("./dto/update-company.dto");
@@ -49,6 +50,10 @@ let CompaniesController = class CompaniesController {
 exports.CompaniesController = CompaniesController;
 __decorate([
     (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new company' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Company created successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - Admin access required' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(client_1.UserType.SYSTEM_ADMIN),
     __param(0, (0, common_1.Body)()),
@@ -58,12 +63,18 @@ __decorate([
 ], CompaniesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all companies' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'List of all companies' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], CompaniesController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get company by ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Company ID' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Company details' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Company not found' }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -71,6 +82,11 @@ __decorate([
 ], CompaniesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Get)(':id/stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get company statistics' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Company ID' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Company statistics' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - Admin access required' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(client_1.UserType.SYSTEM_ADMIN, client_1.UserType.COMPANY_ADMIN),
     __param(0, (0, common_1.Param)('id')),
@@ -80,6 +96,12 @@ __decorate([
 ], CompaniesController.prototype, "getStats", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update company' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Company ID' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Company updated successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - Admin access required' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Company not found' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(client_1.UserType.SYSTEM_ADMIN, client_1.UserType.COMPANY_ADMIN),
     __param(0, (0, common_1.Param)('id')),
@@ -91,6 +113,12 @@ __decorate([
 ], CompaniesController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete company' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Company ID' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Company deleted successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden - Admin access required' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Company not found' }),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(client_1.UserType.SYSTEM_ADMIN),
     __param(0, (0, common_1.Param)('id')),
@@ -100,6 +128,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CompaniesController.prototype, "remove", null);
 exports.CompaniesController = CompaniesController = __decorate([
+    (0, swagger_1.ApiTags)('Companies'),
     (0, common_1.Controller)('companies'),
     __metadata("design:paramtypes", [companies_service_1.CompaniesService])
 ], CompaniesController);

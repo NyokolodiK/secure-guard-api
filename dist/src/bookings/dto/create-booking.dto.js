@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateBookingDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 class CreateBookingDto {
     companyId;
@@ -31,71 +32,136 @@ class CreateBookingDto {
 }
 exports.CreateBookingDto = CreateBookingDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Company ID providing the security service',
+        example: 'company-uuid-here',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "companyId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Booking date (YYYY-MM-DD format)',
+        example: '2024-12-25',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "date", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Booking time (HH:MM format)',
+        example: '14:30',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "time", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Duration in hours',
+        example: 4,
+        minimum: 1,
+    }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateBookingDto.prototype, "duration", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Number of guards required',
+        example: 2,
+        default: 1,
+        minimum: 1,
+    }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateBookingDto.prototype, "numGuards", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Guard attire requirement',
+        enum: client_1.Attire,
+        default: client_1.Attire.SUIT,
+        example: client_1.Attire.SUIT,
+    }),
     (0, class_validator_1.IsEnum)(client_1.Attire),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "attire", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Type of vehicle required',
+        example: 'SUV',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "vehicleType", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Pickup location address',
+        example: '123 Main St, City, State 12345',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "pickupLocation", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Pickup location latitude',
+        example: 40.7128,
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateBookingDto.prototype, "pickupLat", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Pickup location longitude',
+        example: -74.0060,
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateBookingDto.prototype, "pickupLng", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Dropoff location address',
+        example: '456 Oak Ave, City, State 12345',
+    }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "dropoffLocation", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Dropoff location latitude',
+        example: 40.7589,
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateBookingDto.prototype, "dropoffLat", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Dropoff location longitude',
+        example: -73.9851,
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateBookingDto.prototype, "dropoffLng", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Special requests or instructions',
+        example: 'VIP client, extra security measures required',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "specialRequests", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Total price for the booking',
+        example: 500.00,
+    }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)

@@ -1,4 +1,11 @@
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import {
   Controller,
   Get,
@@ -27,6 +34,10 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a new booking' })
+  @ApiResponse({ status: 201, description: 'Booking created successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid input data' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Client access required' })
   @UseGuards(RolesGuard)
   @Roles(UserType.CLIENT)
   create(
@@ -37,6 +48,8 @@ export class BookingsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all bookings for current user' })
+  @ApiResponse({ status: 200, description: 'List of bookings' })
   findAll(@CurrentUser() user: User) {
     return this.bookingsService.findAll(
       user.id,
@@ -46,6 +59,9 @@ export class BookingsController {
   }
 
   @Get('status/:status')
+  @ApiOperation({ summary: 'Get bookings by status' })
+  @ApiParam({ name: 'status', description: 'Booking status' })
+  @ApiResponse({ status: 200, description: 'List of bookings with specified status' })
   findByStatus(
     @Param('status') status: BookingStatus,
     @CurrentUser() user: User,
@@ -59,6 +75,10 @@ export class BookingsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get booking by ID' })
+  @ApiParam({ name: 'id', description: 'Booking ID' })
+  @ApiResponse({ status: 200, description: 'Booking details' })
+  @ApiResponse({ status: 404, description: 'Booking not found' })
   findOne(@Param('id') id: string, @CurrentUser() user: User) {
     return this.bookingsService.findOne(
       id,
@@ -69,6 +89,10 @@ export class BookingsController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update booking' })
+  @ApiParam({ name: 'id', description: 'Booking ID' })
+  @ApiResponse({ status: 200, description: 'Booking updated successfully' })
+  @ApiResponse({ status: 404, description: 'Booking not found' })
   update(
     @Param('id') id: string,
     @Body() updateBookingDto: UpdateBookingDto,
@@ -84,6 +108,10 @@ export class BookingsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete booking' })
+  @ApiParam({ name: 'id', description: 'Booking ID' })
+  @ApiResponse({ status: 200, description: 'Booking deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Booking not found' })
   remove(@Param('id') id: string, @CurrentUser() user: User) {
     return this.bookingsService.remove(
       id,
@@ -94,6 +122,25 @@ export class BookingsController {
   }
 
   @Post(':id/assign-guards')
+  @ApiOperation({ summary: 'Assign guards to booking' })
+  @ApiParam({ name: 'id', description: 'Booking ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        guardIds: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of guard IDs to assign',
+          example: ['guard-id-1', 'guard-id-2'],
+        },
+      },
+      required: ['guardIds'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Guards assigned successfully' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin access required' })
+  @ApiResponse({ status: 404, description: 'Booking not found' })
   @UseGuards(RolesGuard)
   @Roles(UserType.COMPANY_ADMIN, UserType.SYSTEM_ADMIN)
   assignGuards(
